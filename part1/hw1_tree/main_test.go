@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"testing"
+    "bytes"
+    "testing"
 )
 
 const testFullResult = `├───project
@@ -37,15 +37,15 @@ const testFullResult = `├───project
 `
 
 func TestTreeFull(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := dirTree(out, "testdata", true)
-	if err != nil {
-		t.Errorf("test for OK Failed - error")
-	}
-	result := out.String()
-	if result != testFullResult {
-		t.Errorf("test for OK Failed - results not match\nGot:\n%v\nExpected:\n%v", result, testFullResult)
-	}
+    out := new(bytes.Buffer)
+    err := dirTree(out, "testdata", true)
+    if err != nil {
+        t.Errorf("test for OK Failed - error")
+    }
+    result := out.String()
+    if result != testFullResult {
+        t.Errorf("test for OK Failed - results not match\nGot:\n%v\nExpected:\n%v", result, testFullResult)
+    }
 }
 
 const testDirResult = `├───project
@@ -58,18 +58,18 @@ const testDirResult = `├───project
 │	└───z_lorem
 │		└───ipsum
 └───zline
-	└───lorem
-		└───ipsum
+    └───lorem
+        └───ipsum
 `
 
 func TestTreeDir(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := dirTree(out, "testdata", false)
-	if err != nil {
-		t.Errorf("test for OK Failed - error")
-	}
-	result := out.String()
-	if result != testDirResult {
-		t.Errorf("test for OK Failed - results not match\nGot:\n%v\nExpected:\n%v", result, testDirResult)
-	}
+    out := new(bytes.Buffer)
+    err := dirTree(out, "testdata", false)
+    if err != nil {
+        t.Errorf("test for OK Failed - error")
+    }
+    result := out.String()
+    if result != testDirResult {
+        t.Errorf("test for OK Failed - results not match\nGot:\n%v\nExpected:\n%v", result, testDirResult)
+    }
 }
