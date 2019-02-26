@@ -23,71 +23,73 @@ func main() {
 // ---
 
 func dirTree(out io.Writer, path string, printFiles bool) error {
-	var level []bool
-	return dirTreeLevel(out, path, printFiles, level)
-
+	return dirTreeLevel(out, path, printFiles, nil)
 }
 
 func dirTreeLevel(out io.Writer, path string, printFiles bool, level []bool) error {
 	f, _ := os.Open(path)
+	defer f.Close()
 	files, _ := f.Readdir(0)
 
 	sort.Slice(files, func(l, r int) bool {
 		return files[l].Name() < files[r].Name()
 	})
 
-	var dirs []os.FileInfo
-	if (!printFiles) {
-		for _, v := range files {
-			if (v.IsDir()) {
-				dirs = append(dirs,v)
-			}
-		}
-	}
-
-	level = append(level,false)
-
-	var res *[]os.FileInfo
-	if (printFiles) {
-		res = &files
+	var toOut *[]os.FileInfo
+	if printFiles {
+		toOut = &files
 	} else {
-		res = &dirs
+		toOut = new([]os.FileInfo)
+		*toOut = copyIf(files, func(v os.FileInfo) bool {
+			return v.IsDir()
+		})
 	}
-		
 
-	for i, file := range *res {
-		name := file.Name()
-		var prefix string
-		for i := 0; i < len(level) - 1; i++ {
-			if level[i] {
-				prefix = prefix + "│\t"
-			} else {
-				prefix = prefix + "\t"
-			}
+	var prefix string
+	for _, v := range level {
+		if v {
+			prefix = prefix + "│\t"
+		} else {
+			prefix = prefix + "\t"
 		}
-		if i < len(*res)-1 {
+	}
+
+	level = append(level, false)
+
+	for i, file := range *toOut {
+		name := file.Name()
+
+		if i < len(*toOut)-1 {
 			name = prefix + "├───" + name
+			level[len(level)-1] = true
 		} else {
 			name = prefix + "└───" + name
-		}
-		if (i == len(*res)-1) {
 			level[len(level)-1] = false
-		} else {
-			level[len(level)-1] = true
 		}
+
 		if file.IsDir() {
-			io.WriteString(out,name+"\n")
+			io.WriteString(out, name+"\n")
 			dirTreeLevel(out, path+"/"+file.Name(), printFiles, level)
 		} else if printFiles {
 			size := file.Size()
-			if (size != 0) {
+			if size != 0 {
 				name = name + " (" + fmt.Sprintf("%d", size) + "b)"
 			} else {
 				name = name + " (empty)"
 			}
-			io.WriteString(out,name+"\n")
+			io.WriteString(out, name+"\n")
 		}
 
 	}
 	return nil
 }
+
+func copyIf(in []os.FileInfo, predicate func(v os.FileInfo) bool) (out []os.FileInfo) {
+	for _, v := range in {
+		if predicate(v) {
+			out = append(out, v)
+		}
+	}
+	return
+}
+
