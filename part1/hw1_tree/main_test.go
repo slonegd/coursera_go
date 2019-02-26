@@ -58,8 +58,8 @@ const testDirResult = `├───project
 │	└───z_lorem
 │		└───ipsum
 └───zline
-    └───lorem
-        └───ipsum
+	└───lorem
+		└───ipsum
 `
 
 func TestTreeDir(t *testing.T) {
